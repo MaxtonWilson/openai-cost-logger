@@ -76,6 +76,44 @@ class OpenAICostLoggerViz:
 
 
     @staticmethod
+    def get_total_cost_by_response_type(path: str = DEFAULT_LOG_PATH) -> Dict[str, float]:
+        """Return the total cost by response type of all the logs in the directory.
+
+        Args:
+            log_folder (str, optional): Cost logs directory. Defaults to DEFAULT_LOG_PATH.
+                                        This method reads all the files in the specified directory.
+
+        Returns:
+            Dict[str, float]: the total cost by response type.
+        """
+        cost_by_response_type = defaultdict(float)
+        for filename in os.listdir(path):
+            if filename.endswith(".json"):
+                with open(Path(path, filename), mode='r') as file:
+                    data = json.load(file)
+                    for entry in data["breakdown"]:
+                        cost_by_response_type[entry["response_type"]] += entry["cost"]
+        return cost_by_response_type
+
+
+    @staticmethod
+    def plot_cost_by_response_type(path: str = DEFAULT_LOG_PATH) -> None:
+        """Plot the cost by response type of all the logs in the directory.
+
+        Args:
+            log_folder (str, optional): Cost logs directory. Defaults to DEFAULT_LOG_PATH.
+                                        This method reads all the files in the specified directory.
+        """
+        cost_by_response_type = OpenAICostLoggerViz.get_total_cost_by_response_type(path=path)
+        plt.bar(cost_by_response_type.keys(), cost_by_response_type.values(), width=0.5)
+        plt.xticks(rotation=30, fontsize=8)
+        plt.xlabel('Response Type')
+        plt.ylabel('Cost [$]')
+        plt.title('Cost by response type')
+        plt.tight_layout()
+        plt.show()
+
+    @staticmethod
     def plot_cost_by_strftime(path: str = DEFAULT_LOG_PATH, strftime_aggregator: str = "%Y-%m-%d", last_n_days: int = None) -> None:
         """Plot the cost by day of all the logs in the directory aggregated using strftime_aggregator.
 

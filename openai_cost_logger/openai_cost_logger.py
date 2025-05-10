@@ -169,5 +169,6 @@ class OpenAICostLogger:
             "input_tokens": response.usage.prompt_tokens,
             "output_tokens": output_tokens,
             "content": content,
+            "response_type": type(response).__name__,
             "datetime": strftime("%Y-%m-%d %H:%M:%S"),
         }
